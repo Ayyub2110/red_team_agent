@@ -1,0 +1,59 @@
+[tool.poetry]
+name = "red-team-agent"
+version = "0.1.0"
+description = "Autonomous AI Red Teaming Agent — LangGraph-powered offensive security framework with safety guardrails"
+authors = ["Ayub <ayub@example.com>"]
+readme = "README.md"
+license = "MIT"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+langgraph = ">=1.1"
+langgraph-prebuilt = ">=1.0.9"
+langgraph-checkpoint = ">=4.0"
+langchain-core = ">=1.2"
+langchain-ollama = ">=0.3"
+python-nmap = "^0.7.1"
+pymetasploit3 = "^1.0.3"
+scapy = "^2.6"
+requests = "^2.32"
+docker = "^7.1"
+streamlit = "^1.41"
+pydantic = "^2.10"
+pydantic-settings = "^2.7"
+rich = "^13.9"
+python-dotenv = "^1.0"
+structlog = "^24.4"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3"
+pytest-asyncio = "^0.24"
+pytest-cov = "^6.0"
+ruff = "^0.8"
+mypy = "^1.13"
+
+[tool.poetry.scripts]
+redteam = "src.cli:main"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "S", "B", "A", "C4", "SIM"]
+ignore = ["S101", "S603", "S607"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

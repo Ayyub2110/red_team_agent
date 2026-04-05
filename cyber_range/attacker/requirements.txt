@@ -1,0 +1,4 @@
+python-nmap>=0.7.1
+scapy>=2.6
+requests>=2.32
+pymetasploit3>=1.0.3

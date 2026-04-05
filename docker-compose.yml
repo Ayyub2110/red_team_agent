@@ -1,0 +1,114 @@
+# ════════════════════════════════════════════════════════════════
+#  Red Team Agent — Docker Cyber Range
+#  Isolated network with attacker + 3 vulnerable targets
+# ════════════════════════════════════════════════════════════════
+
+services:
+  # ── Attacker Machine ──
+  # Contains all tools; agent connects to this environment
+  attacker:
+    build:
+      context: ./cyber_range/attacker
+      dockerfile: Dockerfile
+    container_name: rt-attacker
+    hostname: attacker
+    networks:
+      redteam_net:
+        ipv4_address: 172.20.0.2
+    volumes:
+      - ./src:/opt/agent/src:ro
+      - ./logs:/opt/agent/logs
+    environment:
+      - ALLOWED_TARGET_SUBNET=172.20.0.0/24
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    stdin_open: true
+    tty: true
+
+  # ── Target 1: DVWA (Damn Vulnerable Web Application) ──
+  # Classic web app with SQL injection, XSS, CSRF, command injection, etc.
+  dvwa:
+    image: vulnerables/web-dvwa:latest
+    container_name: rt-dvwa
+    hostname: dvwa
+    networks:
+      redteam_net:
+        ipv4_address: 172.20.0.10
+    environment:
+      - MYSQL_ROOT_PASSWORD=dvwa_root_pass
+    ports:
+      - "8081:80"   # Exposed for debugging only
+    restart: unless-stopped
+
+  # ── Target 2: Juice Shop (OWASP) ──
+  # Modern web app with injection, broken auth, XSS, insecure deserialization
+  juiceshop:
+    image: bkimminich/juice-shop:latest
+    container_name: rt-juiceshop
+    hostname: juiceshop
+    networks:
+      redteam_net:
+        ipv4_address: 172.20.0.11
+    ports:
+      - "3000:3000"  # Exposed for debugging only
+    restart: unless-stopped
+
+  # ── Target 3: Vulnerable Apache Struts (CVE-2017-5638) ──
+  # Classic RCE vulnerability in Apache Struts2
+  struts_rce:
+    build:
+      context: ./cyber_range/struts_rce
+      dockerfile: Dockerfile
+    container_name: rt-struts-rce
+    hostname: struts-rce
+    networks:
+      redteam_net:
+        ipv4_address: 172.20.0.12
+    ports:
+      - "8082:8080"  # Exposed for debugging only
+    restart: unless-stopped
+
+  # ── Target 4: Vulnerable SSH Server ──
+  # Weak credentials & outdated SSH for brute-force and key-based attacks
+  vuln_ssh:
+    build:
+      context: ./cyber_range/vuln_ssh
+      dockerfile: Dockerfile
+    container_name: rt-vuln-ssh
+    hostname: vuln-ssh
+    networks:
+      redteam_net:
+        ipv4_address: 172.20.0.13
+    ports:
+      - "2222:22"  # Exposed for debugging only
+    restart: unless-stopped
+
+  # ── Metasploit RPC Daemon ──
+  msfrpcd:
+    image: metasploitframework/metasploit-framework:latest
+    container_name: rt-msfrpcd
+    hostname: msfrpcd
+    networks:
+      redteam_net:
+        ipv4_address: 172.20.0.5
+    command: >
+      bash -c "
+        ./msfconsole -q -x '
+          load msgrpc ServerHost=0.0.0.0 ServerPort=55553 User=msf Pass=msf_password SSL=false;
+        '
+      "
+    ports:
+      - "55553:55553"
+    restart: unless-stopped
+
+# ── Isolated Network ──
+networks:
+  redteam_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1
+    # Prevent traffic from escaping to the internet
+    internal: true

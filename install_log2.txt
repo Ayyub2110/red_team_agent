@@ -1,0 +1,8 @@
+﻿Installing dependencies from lock file
+
+Package operations: 0 installs, 2 updates, 0 removals
+
+  - Updating langchain-ollama (0.3.10 -> 1.0.1)
+  - Updating packaging (25.0 -> 26.0)
+
+Installing the current project: red-team-agent (0.1.0)

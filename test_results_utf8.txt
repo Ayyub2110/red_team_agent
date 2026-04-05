@@ -1,0 +1,69 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-8.4.2, pluggy-1.6.0 -- D:\Ayub_backup\projects\red_team_agent\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: D:\Ayub_backup\projects\red_team_agent
+configfile: pyproject.toml
+plugins: anyio-4.13.0, langsmith-0.7.25, asyncio-0.24.0, cov-6.3.0
+asyncio: mode=Mode.AUTO, default_loop_scope=None
+collecting ... collected 20 items
+
+tests/test_core.py::TestTargetValidation::test_valid_target_in_subnet PASSED [  5%]
+tests/test_core.py::TestTargetValidation::test_reject_external_ip PASSED [ 10%]
+tests/test_core.py::TestTargetValidation::test_reject_localhost PASSED   [ 15%]
+tests/test_core.py::TestTargetValidation::test_reject_private_wrong_subnet PASSED [ 20%]
+tests/test_core.py::TestTargetValidation::test_cidr_target_accepted PASSED [ 25%]
+tests/test_core.py::TestTargetValidation::test_unresolvable_hostname_rejected PASSED [ 30%]
+tests/test_core.py::TestBlockedCommands::test_blocked_rm_rf PASSED       [ 35%]
+tests/test_core.py::TestBlockedCommands::test_blocked_fork_bomb PASSED   [ 40%]
+tests/test_core.py::TestBlockedCommands::test_safe_command_allowed PASSED [ 45%]
+tests/test_core.py::TestAgentState::test_initial_state PASSED            [ 50%]
+tests/test_core.py::TestAgentState::test_finding_dataclass PASSED        [ 55%]
+tests/test_core.py::TestConfig::test_default_settings PASSED             [ 60%]
+tests/test_core.py::TestConfig::test_blocked_commands_default PASSED     [ 65%]
+tests/test_core.py::TestAuditLogger::test_audit_record_creates_file FAILED [ 70%]
+tests/test_core.py::TestAuditLogger::test_audit_multiple_records FAILED  [ 75%]
+tests/test_core.py::TestPrompts::test_system_prompt_renders PASSED       [ 80%]
+tests/test_graph.py::TestGraphConstruction::test_graph_compiles FAILED   [ 85%]
+tests/test_graph.py::TestGraphConstruction::test_approval_required_tools FAILED [ 90%]
+tests/test_graph.py::TestGraphConstruction::test_initial_state_structure PASSED [ 95%]
+tests/test_graph.py::TestPhaseTransitions::test_phases_ordered PASSED    [100%]
+
+================================== FAILURES ===================================
+_______________ TestAuditLogger.test_audit_record_creates_file ________________
+tests\test_core.py:150: in test_audit_record_creates_file
+    logger.record(
+src\logging.py:68: in record
+    self._log.info(event, **{k: v for k, v in entry.items() if v is not None})
+E   TypeError: _make_filtering_bound_logger.<locals>.make_method.<locals>.meth() got multiple values for argument 'event'
+_________________ TestAuditLogger.test_audit_multiple_records _________________
+tests\test_core.py:172: in test_audit_multiple_records
+    logger.record(f"event_{i}", tool="test")
+src\logging.py:68: in record
+    self._log.info(event, **{k: v for k, v in entry.items() if v is not None})
+E   TypeError: _make_filtering_bound_logger.<locals>.make_method.<locals>.meth() got multiple values for argument 'event'
+__________________ TestGraphConstruction.test_graph_compiles __________________
+tests\test_graph.py:16: in test_graph_compiles
+    from src.agent.graph import ALL_TOOLS
+src\agent\graph.py:18: in <module>
+    from langgraph.prebuilt import ToolNode
+.venv\Lib\site-packages\langgraph\prebuilt\__init__.py:3: in <module>
+    from langgraph.prebuilt.chat_agent_executor import create_react_agent
+.venv\Lib\site-packages\langgraph\prebuilt\chat_agent_executor.py:32: in <module>
+    from langgraph._internal._runnable import RunnableCallable, RunnableLike
+E   ModuleNotFoundError: No module named 'langgraph._internal'
+_____________ TestGraphConstruction.test_approval_required_tools ______________
+tests\test_graph.py:29: in test_approval_required_tools
+    from src.agent.graph import APPROVAL_REQUIRED_TOOLS
+src\agent\graph.py:18: in <module>
+    from langgraph.prebuilt import ToolNode
+.venv\Lib\site-packages\langgraph\prebuilt\__init__.py:3: in <module>
+    from langgraph.prebuilt.chat_agent_executor import create_react_agent
+.venv\Lib\site-packages\langgraph\prebuilt\chat_agent_executor.py:32: in <module>
+    from langgraph._internal._runnable import RunnableCallable, RunnableLike
+E   ModuleNotFoundError: No module named 'langgraph._internal'
+=========================== short test summary info ===========================
+FAILED tests/test_core.py::TestAuditLogger::test_audit_record_creates_file - ...
+FAILED tests/test_core.py::TestAuditLogger::test_audit_multiple_records - Typ...
+FAILED tests/test_graph.py::TestGraphConstruction::test_graph_compiles - Modu...
+FAILED tests/test_graph.py::TestGraphConstruction::test_approval_required_tools
+======================== 4 failed, 16 passed in 1.04s =========================
