@@ -1,4 +1,10 @@
-python-nmap>=0.7.1
-scapy>=2.6
-requests>=2.32
-pymetasploit3>=1.0.3
+langgraph
+langchain
+langchain-community
+langchain-ollama
+python-nmap
+pymetasploit3
+pydantic
+pyyaml
+rich
+requests
