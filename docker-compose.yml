@@ -1,47 +1,35 @@
-#version: '3.8'
-
-# ====================== NETWORKS ======================
-networks:
-  redteam_net:
-    driver: bridge
-    internal: true                    # ← THIS IS THE KEY FOR SAFETY
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16       # Private subnet for all containers
-
-# ====================== SERVICES ======================
 services:
-
   attacker:
-    build: ./cyber_range/attacker     # Use your attacker Dockerfile
+    build: ./cyber_range/attacker
     container_name: redteam-attacker
     networks:
       - redteam_net
-    depends_on:
-      - dvwa
-      - struts_rce
     stdin_open: true
     tty: true
-    # Security hardening
-    cap_drop:
-      - ALL
+    user: "0:0"                       # Run as root temporarily (for installation)
     security_opt:
-      - no-new-privileges:true
-    read_only: false                  # false for now because tools need to write logs
+      - no-new-privileges:false       # Allow sudo and privilege changes
+    cap_drop: []                      # Remove restrictions temporarily
 
-  # Vulnerable Target 1 - DVWA (Damn Vulnerable Web Application)
+  # Vulnerable Target 1 - DVWA
   dvwa:
     image: vulnerables/web-dvwa:latest
     container_name: redteam-dvwa
     networks:
       - redteam_net
-    # NO ports: section → completely hidden from your host
 
-  # Vulnerable Target 2 - Apache Struts RCE example
+  # Vulnerable Target 2 - Apache Struts RCE
   struts_rce:
     build: ./cyber_range/struts_rce
     container_name: redteam-struts
     networks:
       - redteam_net
 
-  # You can add more targets (e.g. vulns_ssh) later with the same pattern
+networks:
+  redteam_net:
+    driver: bridge
+    internal: true                    # Critical for safety - blocks internet
+    name: redteam_net                 # Clean network name
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
