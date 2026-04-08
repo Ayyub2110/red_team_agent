@@ -23,7 +23,7 @@ class AgentState(TypedDict):
 
     findings: List[Dict[str, Any]]
     # Example finding: {
-    #   "target": "172.20.0.10",
+    #   "target": "172.28.0.10",
     #   "vuln_type": "SQL Injection",
     #   "evidence": "Error-based SQLi detected...",
     #   "severity": "High",
@@ -37,7 +37,7 @@ class AgentState(TypedDict):
     approved_actions: List[str]
     # Track tool calls that required explicit human approval
 
-    allowed_subnet: str = "172.20.0.0/16"
+    allowed_subnet: str = "172.28.0.0/16"
     # Safety guardrail: agent can only target IPs in this subnet
 
     targets: List[str]

@@ -170,7 +170,7 @@ def main() -> None:
         # Pull defaults from config
         settings = get_settings()
         
-        target_input = st.text_input("🎯 TARGET (IP/CIDR)", value="172.20.0.10")
+        target_input = st.text_input("🎯 TARGET (IP/CIDR)", value="172.28.0.10")
         model_name = st.selectbox("🧠 LLM MODEL", [
             settings.llm.ollama_model, 
             "qwen2.5-coder:14b", 
@@ -183,7 +183,7 @@ def main() -> None:
         
         objective = st.text_area(
             "📝 MISSION OBJECTIVE",
-            value="Perform reconnaissance and scanning on target 172.20.0.10. Identify all open ports and services.",
+            value="Perform reconnaissance and scanning on target 172.28.0.10. Identify all open ports and services.",
             height=100,
         )
 

@@ -1,4 +1,4 @@
-﻿Requirement already satisfied: langgraph in .\.venv\Lib\site-packages (0.4.10)
+Requirement already satisfied: langgraph in .\.venv\Lib\site-packages (0.4.10)
 Collecting langgraph
   Downloading langgraph-1.1.6-py3-none-any.whl.metadata (8.0 kB)
 Requirement already satisfied: langgraph-prebuilt in .\.venv\Lib\site-packages (1.0.1)

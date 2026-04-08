@@ -90,7 +90,7 @@ class EngagementEvaluation:
 # ── Expected vulnerabilities for each target in the cyber range ──
 CYBER_RANGE_TARGETS = [
     TargetEvaluation(
-        target_ip="172.20.0.10",
+        target_ip="172.28.0.10",
         target_name="DVWA",
         expected_vulnerabilities=[
             "SQL Injection",
@@ -101,7 +101,7 @@ CYBER_RANGE_TARGETS = [
         ],
     ),
     TargetEvaluation(
-        target_ip="172.20.0.11",
+        target_ip="172.28.0.11",
         target_name="Juice Shop",
         expected_vulnerabilities=[
             "SQL Injection",
@@ -112,7 +112,7 @@ CYBER_RANGE_TARGETS = [
         ],
     ),
     TargetEvaluation(
-        target_ip="172.20.0.12",
+        target_ip="172.28.0.12",
         target_name="Struts RCE",
         expected_vulnerabilities=[
             "Remote Code Execution (CVE-2017-5638)",
@@ -120,7 +120,7 @@ CYBER_RANGE_TARGETS = [
         ],
     ),
     TargetEvaluation(
-        target_ip="172.20.0.13",
+        target_ip="172.28.0.13",
         target_name="Vulnerable SSH",
         expected_vulnerabilities=[
             "Weak SSH Credentials",

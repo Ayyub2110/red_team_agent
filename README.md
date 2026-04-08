@@ -50,7 +50,7 @@ graph TB
         P[⏱️ Step Limiter] --> A
     end
 
-    subgraph "Docker Cyber Range (172.20.0.0/24)"
+    subgraph "Docker Cyber Range (172.28.0.0/24)"
         Q[🖥️ Attacker - .2]
         R[🎯 DVWA - .10]
         S[🎯 Juice Shop - .11]
@@ -173,7 +173,7 @@ docker-compose ps
 
 ```bash
 # CLI mode
-poetry run redteam run --target 172.20.0.0/24
+poetry run redteam run --target 172.28.0.0/24
 
 # Or with a specific model
 poetry run redteam run --model qwen2.5-coder:7b
@@ -234,16 +234,16 @@ red_team_agent/
 
 ## 🐳 Cyber Range
 
-The Docker Compose environment creates an **isolated, air-gapped network** (`172.20.0.0/24`, `internal: true`) with:
+The Docker Compose environment creates an **isolated, air-gapped network** (`172.28.0.0/24`, `internal: true`) with:
 
 | Container | IP | Description |
 |-----------|-----|-------------|
-| `rt-attacker` | 172.20.0.2 | Attacker machine with all tools |
-| `rt-msfrpcd` | 172.20.0.5 | Metasploit RPC daemon |
-| `rt-dvwa` | 172.20.0.10 | DVWA — SQL injection, XSS, command injection |
-| `rt-juiceshop` | 172.20.0.11 | OWASP Juice Shop — modern web vulns |
-| `rt-struts-rce` | 172.20.0.12 | Apache Struts2 RCE (CVE-2017-5638) |
-| `rt-vuln-ssh` | 172.20.0.13 | SSH with weak credentials + exposed secrets |
+| `rt-attacker` | 172.28.0.2 | Attacker machine with all tools |
+| `rt-msfrpcd` | 172.28.0.5 | Metasploit RPC daemon |
+| `rt-dvwa` | 172.28.0.10 | DVWA — SQL injection, XSS, command injection |
+| `rt-juiceshop` | 172.28.0.11 | OWASP Juice Shop — modern web vulns |
+| `rt-struts-rce` | 172.28.0.12 | Apache Struts2 RCE (CVE-2017-5638) |
+| `rt-vuln-ssh` | 172.28.0.13 | SSH with weak credentials + exposed secrets |
 
 > **Network is `internal: true`** — no outbound internet access from any container.
 
@@ -259,7 +259,7 @@ poetry run redteam run
 
 # Custom target & objective
 poetry run redteam run \
-  --target 172.20.0.0/24 \
+  --target 172.28.0.0/24 \
   --objective "Focus on web application vulnerabilities" \
   --model qwen2.5-coder:7b
 
@@ -286,7 +286,7 @@ The Streamlit dashboard provides:
 Safety is a **first-class concern** in this framework. Multiple layers of protection prevent misuse:
 
 ### 1. Target Subnet Validation
-Every tool call validates that the target IP falls within `ALLOWED_TARGET_SUBNET` (default: `172.20.0.0/24`). Requests to external IPs are **immediately rejected**.
+Every tool call validates that the target IP falls within `ALLOWED_TARGET_SUBNET` (default: `172.28.0.0/24`). Requests to external IPs are **immediately rejected**.
 
 ### 2. Human-in-the-Loop (HITL)
 Exploit-type actions (e.g., `msf_run_exploit`) display a Rich-formatted approval prompt:
@@ -294,7 +294,7 @@ Exploit-type actions (e.g., `msf_run_exploit`) display a Rich-formatted approval
 ```
 ┌─ ⚠️  Human-in-the-Loop Approval Required ──────────┐
 │ Tool:        msf_run_exploit                         │
-│ Target:      172.20.0.12                             │
+│ Target:      172.28.0.12                             │
 │ Risk Level:  critical                                │
 │ Parameters:                                          │
 │   • module: exploit/multi/http/struts2_content_...   │

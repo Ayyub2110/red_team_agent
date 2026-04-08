@@ -90,7 +90,7 @@ def directory_bruteforce(base_url: str, wordlist: list[str] | None = None) -> st
     """Probe common web paths to discover hidden endpoints.
 
     Args:
-        base_url: Base URL (e.g. 'http://172.20.0.3:80').
+        base_url: Base URL (e.g. 'http://172.28.0.3:80').
         wordlist: Custom list of paths to try. Uses defaults if not provided.
 
     Returns:

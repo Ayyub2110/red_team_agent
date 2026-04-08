@@ -1,4 +1,4 @@
-﻿Updating dependencies
+Updating dependencies
 Resolving dependencies...
 
 Writing lock file

@@ -1,15 +1,29 @@
 services:
+  # Attacker Container
   attacker:
     build: ./cyber_range/attacker
     container_name: redteam-attacker
+    environment:
+      - OLLAMA_HOST=redteam-ollama:11434
     networks:
       - redteam_net
     stdin_open: true
     tty: true
-    user: "0:0"                       # Run as root temporarily (for installation)
+    user: "0:0"
     security_opt:
-      - no-new-privileges:false       # Allow sudo and privilege changes
-    cap_drop: []                      # Remove restrictions temporarily
+      - no-new-privileges:false
+    cap_drop: []
+    depends_on:
+      - ollama
+
+  # Ollama Model Server
+  ollama:
+    image: ollama/ollama:latest
+    container_name: redteam-ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - redteam_net
 
   # Vulnerable Target 1 - DVWA
   dvwa:
@@ -28,8 +42,11 @@ services:
 networks:
   redteam_net:
     driver: bridge
-    internal: true                    # Critical for safety - blocks internet
-    name: redteam_net                 # Clean network name
+    internal: false                    # Set to false to allow initial downloads
+    name: redteam_net
     ipam:
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: 172.28.0.0/16        # Changed from 172.20.0.0 to fix overlap
+
+volumes:
+  ollama_data:

@@ -15,7 +15,7 @@ def ping_sweep(subnet: str) -> str:
     """Perform an ICMP ping sweep to discover live hosts on a subnet.
 
     Args:
-        subnet: Target subnet in CIDR notation (e.g. '172.20.0.0/24').
+        subnet: Target subnet in CIDR notation (e.g. '172.28.0.0/24').
 
     Returns:
         JSON list of responding hosts.

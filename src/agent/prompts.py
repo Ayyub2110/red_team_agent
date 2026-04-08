@@ -1,6 +1,4 @@
-"""Prompt templates for each kill-chain phase of the red team agent."""
-
-from __future__ import annotations
+from src.config import get_settings
 
 SYSTEM_PROMPT = """\
 You are an autonomous AI Red Team Agent operating inside a controlled, isolated Docker-based \
@@ -101,10 +99,11 @@ def build_system_prompt(
         state:     Current AgentState (as a dict).
         max_steps: Hard ceiling on reasoning steps.
     """
+    settings = get_settings()
     phase = state.get("current_phase", "recon")
 
     return SYSTEM_PROMPT.format(
-        allowed_subnet=state.get("allowed_subnet", "172.20.0.0/16"),
+        allowed_subnet=state.get("allowed_subnet", settings.safety.allowed_target_subnet),
         max_steps=max_steps,
         current_phase=phase,
         step_count=state.get("step_count", 0),

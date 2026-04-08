@@ -113,7 +113,7 @@ def main() -> None:
 
     # ── run ──
     rp = sub.add_parser("run", help="Launch the red team agent")
-    rp.add_argument("-t", "--target", default="172.20.0.0/16", help="Target subnet (CIDR)")
+    rp.add_argument("-t", "--target", default="172.28.0.0/16", help="Target subnet (CIDR)")
     rp.add_argument(
         "-o", "--objective",
         default="Perform a full red team assessment on the DVWA target.",

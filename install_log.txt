@@ -1,4 +1,4 @@
-﻿Requirement already satisfied: langgraph-prebuilt in .\.venv\Lib\site-packages (1.0.1)
+Requirement already satisfied: langgraph-prebuilt in .\.venv\Lib\site-packages (1.0.1)
 Requirement already satisfied: langchain-core>=0.3.67 in .\.venv\Lib\site-packages (from langgraph-prebuilt) (0.3.83)
 Requirement already satisfied: langgraph-checkpoint<4.0.0,>=2.1.0 in .\.venv\Lib\site-packages (from langgraph-prebuilt) (3.0.1)
 Requirement already satisfied: ormsgpack>=1.12.0 in .\.venv\Lib\site-packages (from langgraph-checkpoint<4.0.0,>=2.1.0->langgraph-prebuilt) (1.12.2)
