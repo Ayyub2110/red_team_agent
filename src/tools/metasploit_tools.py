@@ -14,6 +14,7 @@ from src.logging import get_audit_logger
 def _get_msf_client() -> Any:
     """Lazy-connect to the Metasploit RPC daemon."""
     from pymetasploit3.msfrpc import MsfRpcClient
+
     from src.config import get_settings
 
     cfg = get_settings().metasploit

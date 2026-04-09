@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
-import os
 import pytest
-from unittest.mock import patch
 
 # Set test environment before importing modules
-os.environ["ALLOWED_TARGET_SUBNET"] = "0.0.0.0/0"
-os.environ["REQUIRE_HUMAN_APPROVAL"] = "false"
+# os.environ["ALLOWED_TARGET_SUBNET"] = "0.0.0.0/0"
+# os.environ["REQUIRE_HUMAN_APPROVAL"] = "false"
 
 
 @pytest.fixture(autouse=True)
@@ -32,10 +30,11 @@ class TestTargetValidation:
         validate_target("172.28.0.255")
         validate_target("172.28.0.1")
 
-    def test_allow_any_ip(self) -> None:
+    def test_allow_any_ip(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """With 0.0.0.0/0, everything should pass."""
+        monkeypatch.setenv("ALLOWED_TARGET_SUBNET", "0.0.0.0/0")
         from src.guardrails import validate_target
-        
+
         # External, internal, and local IPs should all be allowed now
         validate_target("8.8.8.8")
         validate_target("172.28.0.10")
@@ -50,7 +49,7 @@ class TestTargetValidation:
 
     def test_unresolvable_hostname_rejected(self) -> None:
         """Hostnames that cannot be resolved should be rejected."""
-        from src.guardrails import validate_target, TargetValidationError
+        from src.guardrails import TargetValidationError, validate_target
 
         with pytest.raises(TargetValidationError, match="Cannot resolve"):
             validate_target("this-host-does-not-exist-12345.invalid")
@@ -60,13 +59,13 @@ class TestBlockedCommands:
     """Ensure dangerous shell commands are blocked."""
 
     def test_blocked_rm_rf(self) -> None:
-        from src.guardrails import check_blocked_commands, TargetValidationError
+        from src.guardrails import TargetValidationError, check_blocked_commands
 
         with pytest.raises(TargetValidationError, match="blocked pattern"):
             check_blocked_commands("rm -rf /")
 
     def test_blocked_fork_bomb(self) -> None:
-        from src.guardrails import check_blocked_commands, TargetValidationError
+        from src.guardrails import TargetValidationError, check_blocked_commands
 
         with pytest.raises(TargetValidationError, match="blocked pattern"):
             check_blocked_commands(":(){:|:&};:")
@@ -122,7 +121,7 @@ class TestConfig:
 
         settings = Settings()
         assert settings.safety.max_agent_steps == 50
-        assert settings.safety.require_human_approval is False  # overridden by env
+        assert settings.safety.require_human_approval is True
         assert "172.28.0.0/16" in settings.safety.allowed_target_subnet
 
     def test_blocked_commands_default(self) -> None:
@@ -136,8 +135,9 @@ class TestAuditLogger:
     """Verify audit logging writes correct entries."""
 
     def test_audit_record_creates_file(self, tmp_path) -> None:
-        from src.logging import AuditLogger
         import json
+
+        from src.logging import AuditLogger
 
         log_file = tmp_path / "test_audit.jsonl"
         logger = AuditLogger(log_file)
@@ -157,8 +157,9 @@ class TestAuditLogger:
         assert entries[0]["target"] == "172.28.0.10"
 
     def test_audit_multiple_records(self, tmp_path) -> None:
-        from src.logging import AuditLogger
         import json
+
+        from src.logging import AuditLogger
 
         log_file = tmp_path / "test_audit2.jsonl"
         logger = AuditLogger(log_file)
@@ -184,8 +185,10 @@ class TestPrompts:
             "sessions": [],
         }
 
+        # state.get("allowed_subnet", settings.safety.allowed_target_subnet)
         prompt = build_system_prompt(state)
         assert "scanning" in prompt.lower()
+        # The default settings use 172.28.0.0/16
         assert "172.28.0.0/16" in prompt
         assert "2 finding(s)" in prompt
         assert "Step**: 5" in prompt

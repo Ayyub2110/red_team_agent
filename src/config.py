@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from pydantic_settings import BaseSettings
+
 from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 class LLMSettings(BaseSettings):
@@ -31,7 +32,7 @@ class SafetySettings(BaseSettings):
     require_human_approval: bool = Field(default=True, alias="REQUIRE_HUMAN_APPROVAL")
     disable_target_validation: bool = Field(default=False, alias="DISABLE_TARGET_VALIDATION")
     max_agent_steps: int = Field(default=50, alias="MAX_AGENT_STEPS")
-    allowed_target_subnet: str = Field(default="0.0.0.0/0", alias="ALLOWED_TARGET_SUBNET")
+    allowed_target_subnet: str = Field(default="172.28.0.0/16", alias="ALLOWED_TARGET_SUBNET")
     blocked_commands: list[str] = Field(default_factory=lambda: [
         "rm -rf /",
         "mkfs",

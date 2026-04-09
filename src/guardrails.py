@@ -32,7 +32,7 @@ def validate_target(target: str) -> None:
         TargetValidationError: If the target is outside scope.
     """
     settings = get_settings()
-    
+
     # If guardrails are disabled or set to global, bypass the check
     if settings.safety.disable_target_validation or settings.safety.allowed_target_subnet == "0.0.0.0/0":
         return

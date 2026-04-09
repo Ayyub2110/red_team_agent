@@ -1,41 +1,46 @@
-"""
-LangGraph implementation for the Autonomous AI Red Team Agent.
+"""LangGraph implementation for the Autonomous AI Red Team Agent.
 
-Uses a ReAct loop (reason -> act -> observe) with dynamic system prompt 
+Uses a ReAct loop (reason -> act -> observe) with dynamic system prompt
 injection and persistent memory using LangGraph 1.x.
 """
 
-from typing import Literal, Any
-from langchain_core.messages import SystemMessage, HumanMessage
+from typing import Any
+
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_ollama import ChatOllama
-from langgraph.graph import StateGraph, START, END
-from langgraph.prebuilt import create_react_agent
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import END, START, StateGraph
+from langgraph.prebuilt import create_react_agent
 
-from src.agent.state import AgentState
 from src.agent.prompts import build_system_prompt
-from src.tools import tools as all_tools
+from src.agent.state import AgentState, initial_state
 from src.config import get_settings
+from src.tools import tools as tools_list
+
+# Export tools for tests/integration
+ALL_TOOLS = tools_list
+APPROVAL_REQUIRED_TOOLS = [
+    "msf_run_exploit",
+]
 
 
-def build_redteam_graph(model: Any) -> StateGraph:
-    """
-    Builds and compiles the red teaming agent graph.
-    
+def build_redteam_graph(model: Any) -> Any:
+    """Builds and compiles the red teaming agent graph.
+
     Args:
         model: A chat model (e.g. ChatOllama) to drive the agent reasoning.
     """
 
     # System prompt function that injects dynamic state into the prompt template
-    def get_system_prompt(state: AgentState) -> list:
-        prompt = build_system_prompt(dict(state), max_steps=state.get("max_steps", 15))
+    def get_system_prompt(state: AgentState) -> list[BaseMessage]:
+        prompt = build_system_prompt(dict(state), max_steps=state.get("max_steps", 50))
         return [SystemMessage(content=prompt)]
 
     # We use a custom graph structure because we may want to add advanced phases later.
     # 1. Create the core logic (ReAct agent)
     agent = create_react_agent(
         model=model,
-        tools=all_tools,
+        tools=ALL_TOOLS,
         state_modifier=get_system_prompt,   # Injects dynamic safety/phase info
         checkpointer=MemorySaver(),         # Enables session memory
     )
@@ -53,38 +58,33 @@ def build_redteam_graph(model: Any) -> StateGraph:
 
 
 def run_redteam_agent(
-    objective: str, 
-    targets: list[str], 
-    max_steps: int = 15,
-    thread_id: str = "redteam-session-1"
-):
-    """
-    High-level entry point to execute the agent for a specific objective.
-    """
+    objective: str,
+    targets: list[str],
+    max_steps: int = 50,
+    thread_id: str = "redteam-session-1",
+) -> Any:
+    """High-level entry point to execute the agent for a specific objective."""
     settings = get_settings()
-    
+
     # Initialize the LLM (Ollama)
     model = ChatOllama(
         base_url=settings.llm.ollama_base_url,
         model=settings.llm.ollama_model,
         temperature=settings.llm.temperature,
     )
-    
-    # Prepare initial state
-    initial_input: AgentState = {
-        "messages": [HumanMessage(content=objective)],
-        "current_phase": "recon",
-        "findings": [],
-        "step_count": 0,
-        "max_steps": max_steps,
-        "approved_actions": [],
-        "allowed_subnet": settings.safety.allowed_target_subnet,
-        "targets": targets,
-    }
+
+    # Use the robust factory function for initial state
+    initial_input = initial_state(
+        targets=targets,
+        max_steps=max_steps,
+        allowed_subnet=settings.safety.allowed_target_subnet,
+    )
+    # Add the initial objective message
+    initial_input["messages"] = [HumanMessage(content=objective)]
 
     config = {"configurable": {"thread_id": thread_id}}
     graph = build_redteam_graph(model=model)
-    
+
     # Stream for visibility in CLI/UI applications
     print(f"\n🚀 Engagement started: {objective}\n")
     for chunk in graph.stream(initial_input, config, stream_mode="updates"):
@@ -93,5 +93,5 @@ def run_redteam_agent(
             msg = chunk["redteam_agent"]["messages"][-1]
             if hasattr(msg, "content") and msg.content:
                 print(f"[Agent]: {msg.content[:500]}...")
-    
+
     return graph.get_state(config)

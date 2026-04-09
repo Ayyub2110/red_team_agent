@@ -6,9 +6,6 @@ Run with: streamlit run src/ui/app.py
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
-
 import streamlit as st
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 
@@ -166,21 +163,21 @@ def main() -> None:
     # ── Sidebar ──
     with st.sidebar:
         st.header("⚙️ CONFIGURATION")
-        
+
         # Pull defaults from config
         settings = get_settings()
-        
+
         target_input = st.text_input("🎯 TARGET (IP/CIDR)", value="172.28.0.10")
-        model_name = st.selectbox("🧠 LLM MODEL", [
+        st.selectbox("🧠 LLM MODEL", [
             settings.llm.ollama_model, 
             "qwen2.5-coder:14b", 
             "llama3.3", 
             "mistral-nemo"
         ])
         max_steps = st.slider("⏱️ MAX STEPS", min_value=5, max_value=50, value=15)
-        
+
         st.divider()
-        
+
         objective = st.text_area(
             "📝 MISSION OBJECTIVE",
             value="Perform reconnaissance and scanning on target 172.28.0.10. Identify all open ports and services.",
@@ -190,14 +187,14 @@ def main() -> None:
         st.divider()
 
         start_btn = st.button("🚀 INITIATE ENGAGEMENT", type="primary", use_container_width=True)
-        interrupt_btn = st.button("🛑 HALT AGENT", type="secondary", use_container_width=True)
+        st.button("🛑 HALT AGENT", type="secondary", use_container_width=True)
 
     # ── Dashboard Layout ──
     col1, col2 = st.columns([2, 1])
 
     with col1:
         st.subheader("📡 Mission Control")
-        
+
         # Placeholder for messages
         chat_container = st.container(height=500)
 
@@ -209,12 +206,12 @@ def main() -> None:
                 # Store in session state
                 st.session_state["messages"] = []
                 st.session_state["findings"] = []
-                
+
                 with st.spinner("🤖 Agent is thinking..."):
                     try:
                         # Prepare targets list
                         targets = [target_input]
-                        
+
                         # Execute the agent
                         # For a real UI, you would stream this, but we'll start with blocking call for MVP
                         # we can also update st.session_state as we stream.
@@ -223,11 +220,11 @@ def main() -> None:
                             targets=targets,
                             max_steps=max_steps
                         ).get("values", {})
-                        
+
                         st.session_state["agent_state"] = state_values
                         st.session_state["messages"] = state_values.get("messages", [])
                         st.session_state["findings"] = state_values.get("findings", [])
-                        
+
                         st.success("✅ Operation complete!")
                     except Exception as exc:
                         st.error(f"❌ Critical Failure: {exc}")
@@ -249,10 +246,10 @@ def main() -> None:
 
     with col2:
         st.subheader("🔍 Intelligence")
-        
+
         # Current state display
         agent_state = st.session_state.get("agent_state", {})
-        
+
         st.markdown(
             f"""
             <div class="metric-container">
@@ -265,13 +262,13 @@ def main() -> None:
                     <div class="metric-label">Findings</div>
                 </div>
             </div>
-            """, 
+            """,
             unsafe_allow_html=True
         )
-        
+
         phase = agent_state.get("current_phase", "OFFLINE")
         st.info(f"📍 ACTIVE PHASE: {phase.upper()}")
-        
+
         # Findings List
         st.markdown("### 🧬 Findings")
         findings = st.session_state.get("findings", [])

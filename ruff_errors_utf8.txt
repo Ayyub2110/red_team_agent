@@ -1,0 +1,274 @@
+﻿W291 Trailing whitespace
+ --> src\agent\graph.py:4:72
+  |
+2 | LangGraph implementation for the Autonomous AI Red Team Agent.
+3 |
+4 | Uses a ReAct loop (reason -> act -> observe) with dynamic system prompt 
+  |                                                                        ^
+5 | injection and persistent memory using LangGraph 1.x.
+6 | """
+  |
+help: Remove trailing whitespace
+
+W293 Blank line contains whitespace
+  --> src\agent\graph.py:31:1
+   |
+29 |     """
+30 |     Builds and compiles the red teaming agent graph.
+31 |     
+   | ^^^^
+32 |     Args:
+33 |         model: A chat model (e.g. ChatOllama) to drive the agent reasoning.
+   |
+help: Remove whitespace from blank line
+
+E501 Line too long (108 > 100)
+  --> src\agent\prompts.py:12:101
+   |
+10 | 2. **NEVER** attempt to escape the sandbox, pivot to real networks, or access the internet.
+11 | 3. **ALWAYS** request human approval before executing exploits or destructive actions.
+12 | 4. Work through phases in order: Recon ΓåÆ Scanning ΓåÆ Exploitation ΓåÆ Post-Exploitation ΓåÆ Triage ΓåÆ Remediation.
+   |                                                                                                     ^^^^^^^^
+13 | 5. Document every finding with: target, vuln_type, evidence, severity, and remediation.
+14 | 6. Stop after {max_steps} reasoning steps or when the human operator requests it.
+   |
+
+E501 Line too long (102 > 100)
+  --> src\cli.py:86:101
+   |
+84 |         sys.exit(1)
+85 |
+86 |     entries = [json.loads(line) for line in log_path.read_text().strip().splitlines() if line.strip()]
+   |                                                                                                     ^^
+87 |
+88 |     console.print(Panel(f"≡ƒôï Audit Log ΓÇö {len(entries)} entries", style="bold blue"))
+   |
+
+C401 Unnecessary generator (rewrite as a set comprehension)
+  --> src\evaluation.py:28:21
+   |
+26 |         if not self.expected_vulnerabilities:
+27 |             return 0.0
+28 |         found_set = set(v.lower() for v in self.found_vulnerabilities)
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+29 |         expected_set = set(v.lower() for v in self.expected_vulnerabilities)
+30 |         return len(found_set & expected_set) / len(expected_set)
+   |
+help: Rewrite as a set comprehension
+
+C401 Unnecessary generator (rewrite as a set comprehension)
+  --> src\evaluation.py:29:24
+   |
+27 |             return 0.0
+28 |         found_set = set(v.lower() for v in self.found_vulnerabilities)
+29 |         expected_set = set(v.lower() for v in self.expected_vulnerabilities)
+   |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+30 |         return len(found_set & expected_set) / len(expected_set)
+   |
+help: Rewrite as a set comprehension
+
+E501 Line too long (105 > 100)
+  --> src\evaluation.py:35:101
+   |
+33 |     def phase_completion(self) -> float:
+34 |         """Fraction of kill-chain phases completed."""
+35 |         phases = [self.recon_success, self.scan_success, self.exploit_success, self.post_exploit_success]
+   |                                                                                                     ^^^^^
+36 |         return sum(phases) / len(phases)
+   |
+
+N818 Exception name `HumanApprovalDenied` should be named with an Error suffix
+  --> src\guardrails.py:22:7
+   |
+22 | class HumanApprovalDenied(Exception):
+   |       ^^^^^^^^^^^^^^^^^^^
+23 |     """Raised when a human operator denies a tool invocation."""
+   |
+
+E501 Line too long (105 > 100)
+  --> src\guardrails.py:37:101
+   |
+36 |     # If guardrails are disabled or set to global, bypass the check
+37 |     if settings.safety.disable_target_validation or settings.safety.allowed_target_subnet == "0.0.0.0/0":
+   |                                                                                                     ^^^^^
+38 |         return
+   |
+
+E501 Line too long (105 > 100)
+  --> src\guardrails.py:82:101
+   |
+80 |         f"[bold]Tool:[/bold]        {tool_name}\n"
+81 |         f"[bold]Target:[/bold]      {target}\n"
+82 |         f"[bold]Risk Level:[/bold]  [{'red' if risk_level == 'critical' else 'yellow'}]{risk_level}[/]\n"
+   |                                                                                                     ^^^^^
+83 |         f"[bold]Parameters:[/bold]\n"
+84 |     )
+   |
+
+A005 Module `logging` shadows a Python standard-library module
+--> src\logging.py:1:1
+
+E501 Line too long (103 > 100)
+  --> src\logging.py:67:101
+   |
+65 |             f.write(json.dumps(entry) + "\n")
+66 |
+67 |         # Also emit via structlog (exclude 'event' key to avoid collision with structlog's event param)
+   |                                                                                                     ^^^
+68 |         log_extra = {k: v for k, v in entry.items() if v is not None and k != "event"}
+69 |         self._log.info(event, **log_extra)
+   |
+
+E501 Line too long (101 > 100)
+  --> src\tools\http_tools.py:45:101
+   |
+43 |             "url": str(resp.url),
+44 |         }
+45 |         audit.record("http_get_complete", tool="http", target=url, result=f"HTTP {resp.status_code}")
+   |                                                                                                     ^
+46 |         return json.dumps(result, indent=2)
+47 |     except requests.RequestException as exc:
+   |
+
+E501 Line too long (107 > 100)
+  --> src\tools\http_tools.py:53:101
+   |
+52 | @tool
+53 | def http_post(url: str, data: dict | None = None, json_body: dict | None = None, timeout: int = 10) -> str:
+   |                                                                                                     ^^^^^^^
+54 |     """Send an HTTP POST request.
+   |
+
+E501 Line too long (106 > 100)
+  --> src\tools\http_tools.py:72:101
+   |
+71 |     audit = get_audit_logger()
+72 |     audit.record("http_post_start", tool="http", target=url, parameters={"data": data, "json": json_body})
+   |                                                                                                     ^^^^^^
+73 |
+74 |     try:
+   |
+
+E501 Line too long (102 > 100)
+  --> src\tools\http_tools.py:81:101
+   |
+79 |             "body_preview": resp.text[:2000],
+80 |         }
+81 |         audit.record("http_post_complete", tool="http", target=url, result=f"HTTP {resp.status_code}")
+   |                                                                                                     ^^
+82 |         return json.dumps(result, indent=2)
+83 |     except requests.RequestException as exc:
+   |
+
+W293 Blank line contains whitespace
+   --> src\ui\app.py:118:1
+    |
+116 |         border: none;
+117 |     }
+118 |     
+    | ^^^^
+119 |     /* Metrics display */
+120 |     .metric-container {
+    |
+help: Remove whitespace from blank line
+
+F841 Local variable `model_name` is assigned to but never used
+   --> src\ui\app.py:171:9
+    |
+170 |         target_input = st.text_input("≡ƒÄ» TARGET (IP/CIDR)", value="172.28.0.10")
+171 |         model_name = st.selectbox("≡ƒºá LLM MODEL", [
+    |         ^^^^^^^^^^
+172 |             settings.llm.ollama_model,
+173 |             "qwen2.5-coder:14b",
+    |
+help: Remove assignment to unused variable `model_name`
+
+E501 Line too long (117 > 100)
+   --> src\ui\app.py:183:101
+    |
+181 |         objective = st.text_area(
+182 |             "≡ƒô¥ MISSION OBJECTIVE",
+183 |             value="Perform reconnaissance and scanning on target 172.28.0.10. Identify all open ports and services.",
+    |                                                                                                     ^^^^^^^^^^^^^^^^^
+184 |             height=100,
+185 |         )
+    |
+
+F841 Local variable `interrupt_btn` is assigned to but never used
+   --> src\ui\app.py:190:9
+    |
+189 |         start_btn = st.button("≡ƒÜÇ INITIATE ENGAGEMENT", type="primary", use_container_width=True)
+190 |         interrupt_btn = st.button("≡ƒ¢æ HALT AGENT", type="secondary", use_container_width=True)
+    |         ^^^^^^^^^^^^^
+191 |
+192 |     # ΓöÇΓöÇ Dashboard Layout ΓöÇΓöÇ
+    |
+help: Remove assignment to unused variable `interrupt_btn`
+
+E501 Line too long (106 > 100)
+   --> src\ui\app.py:216:101
+    |
+215 |                         # Execute the agent
+216 |                         # For a real UI, you would stream this, but we'll start with blocking call for MVP
+    |                                                                                                     ^^^^^^
+217 |                         # we can also update st.session_state as we stream.
+218 |                         state_values = run_redteam_agent(
+    |
+
+E501 Line too long (116 > 100)
+   --> src\ui\app.py:237:101
+    |
+235 |             for msg in history:
+236 |                 if isinstance(msg, HumanMessage):
+237 |                     st.markdown(f'<div class="chat-bubble user-bubble">{msg.content}</div>', unsafe_allow_html=True)
+    |                                                                                                     ^^^^^^^^^^^^^^^^
+238 |                 elif isinstance(msg, AIMessage):
+239 |                     if msg.content:
+    |
+
+E501 Line too long (121 > 100)
+   --> src\ui\app.py:240:101
+    |
+238 |                 elif isinstance(msg, AIMessage):
+239 |                     if msg.content:
+240 |                         st.markdown(f'<div class="chat-bubble agent-bubble">{msg.content}</div>', unsafe_allow_html=True)
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^^^^
+241 |                     if msg.tool_calls:
+242 |                         for tool in msg.tool_calls:
+    |
+
+E501 Line too long (143 > 100)
+   --> src\ui\app.py:243:101
+    |
+241 | ΓÇª
+242 | ΓÇª
+243 | ΓÇªat-bubble system-bubble">Executing Tool: {tool["name"]}</div>', unsafe_allow_html=True)
+    |                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+244 | ΓÇª
+245 | ΓÇªe system-bubble">{msg.content}</div>', unsafe_allow_html=True)
+    |
+
+E501 Line too long (118 > 100)
+   --> src\ui\app.py:245:101
+    |
+243 |                             st.markdown(f'<div class="chat-bubble system-bubble">Executing Tool: {tool["name"]}</div>', unsafe_allow_ΓÇª
+244 |                 elif isinstance(msg, SystemMessage):
+245 |                     st.markdown(f'<div class="chat-bubble system-bubble">{msg.content}</div>', unsafe_allow_html=True)
+    |                                                                                                     ^^^^^^^^^^^^^^^^^^
+246 |
+247 |     with col2:
+    |
+
+E501 Line too long (105 > 100)
+   --> src\ui\app.py:279:100
+    |
+277 |         else:
+278 |             for f in findings:
+279 |                 with st.expander(f"≡ƒö┤ {f.get('vuln_type', 'Discovery')} - {f.get('target', 'Generic')}"):
+    |                                                                                                     ^^^^^
+280 |                     st.write(f"**Severity:** {f.get('severity', 'Unknown')}")
+281 |                     st.write(f"**Evidence:** {f.get('evidence', 'No data')}")
+    |
+
+Found 26 errors.
+No fixes available (7 hidden fixes can be enabled with the `--unsafe-fixes` option).

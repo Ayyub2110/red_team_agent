@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
-from typing import Any
 
 
 @dataclass
@@ -27,8 +25,8 @@ class TargetEvaluation:
         """Fraction of expected vulns that were found."""
         if not self.expected_vulnerabilities:
             return 0.0
-        found_set = set(v.lower() for v in self.found_vulnerabilities)
-        expected_set = set(v.lower() for v in self.expected_vulnerabilities)
+        found_set = {v.lower() for v in self.found_vulnerabilities}
+        expected_set = {v.lower() for v in self.expected_vulnerabilities}
         return len(found_set & expected_set) / len(expected_set)
 
     @property

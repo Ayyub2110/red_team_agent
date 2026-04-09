@@ -2,10 +2,8 @@
 
 from __future__ import annotations
 
-import os
-
-os.environ["ALLOWED_TARGET_SUBNET"] = "172.28.0.0/24"
-os.environ["REQUIRE_HUMAN_APPROVAL"] = "false"
+# os.environ["ALLOWED_TARGET_SUBNET"] = "172.28.0.0/24"
+# os.environ["REQUIRE_HUMAN_APPROVAL"] = "false"
 
 
 class TestGraphConstruction:

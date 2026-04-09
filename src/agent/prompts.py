@@ -16,7 +16,7 @@ in designated target systems following a structured kill-chain methodology.
 ## Current Engagement Context
 - **Phase**: {current_phase}
 - **Step**: {step_count} / {max_steps}
-- **Findings so far**: {findings_count}
+- **Findings**: {findings_count} finding(s)
 - **Approved actions**: {approved_actions}
 
 ## Available Tools

@@ -25,7 +25,7 @@ def ping_sweep(subnet: str) -> str:
     audit.record("ping_sweep_start", tool="scapy", target=subnet)
 
     try:
-        from scapy.all import IP, ICMP, sr, conf  # type: ignore[import-untyped]
+        from scapy.all import ICMP, IP, conf, sr  # type: ignore[import-untyped]
 
         conf.verb = 0  # silence scapy output
         ans, _ = sr(IP(dst=subnet) / ICMP(), timeout=3, retry=1)
@@ -59,7 +59,7 @@ def tcp_syn_scan(target: str, ports: str = "1-1024") -> str:
     audit.record("syn_scan_start", tool="scapy", target=target, parameters={"ports": ports})
 
     try:
-        from scapy.all import IP, TCP, sr, conf  # type: ignore[import-untyped]
+        from scapy.all import IP, TCP, conf, sr  # type: ignore[import-untyped]
 
         conf.verb = 0
 
