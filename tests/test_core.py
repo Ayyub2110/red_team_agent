@@ -92,6 +92,36 @@ class TestAgentState:
         assert state["findings"] == []
         assert state["sessions"] == []
         assert state["messages"] == []
+        # New fields
+        assert state["risk_score"] == 0.0
+        assert state["discovered_targets"] == []
+        assert state["active_sessions"] == {}
+        assert state["strategy_history"] == []
+        assert state["aggression_level"] == "medium"
+        assert state["stealth_mode"] is False
+        # Error tracking fields
+        assert state["error_log"] == []
+        assert state["phase_failures"] == {}
+        assert state["consecutive_failures"] == 0
+        assert state["total_errors"] == 0
+        assert state["kill_switch_triggered"] is False
+        assert state["kill_switch_reason"] == ""
+        assert state["critic_feedback"] == []
+        assert state["last_successful_phase"] == ""
+
+    def test_initial_state_custom_params(self) -> None:
+        from src.agent.state import initial_state
+
+        state = initial_state(
+            targets=["172.28.0.10"],
+            max_steps=25,
+            aggression_level="low",
+            stealth_mode=True,
+        )
+        assert state["aggression_level"] == "low"
+        assert state["stealth_mode"] is True
+        assert state["max_steps"] == 25
+        assert state["targets"] == ["172.28.0.10"]
 
     def test_finding_dataclass(self) -> None:
         from src.agent.state import Finding
@@ -105,12 +135,71 @@ class TestAgentState:
             evidence="Parameter 'id' is injectable",
             remediation="Use parameterized queries",
             cve="CVE-2021-XXXX",
+            confidence=0.95,
         )
 
         d = finding.to_dict()
         assert d["target"] == "172.28.0.10"
         assert d["severity"] == "critical"
         assert d["exploited"] is False
+        assert d["confidence"] == 0.95
+
+    def test_risk_score_calculation(self) -> None:
+        from src.agent.state import calculate_risk_score
+
+        findings = [
+            {"severity": "critical"},
+            {"severity": "high"},
+            {"severity": "low"},
+        ]
+        score = calculate_risk_score(findings)
+        # critical=25 + high=15 + low=3 = 43
+        assert score == 43.0
+
+    def test_risk_score_caps_at_100(self) -> None:
+        from src.agent.state import calculate_risk_score
+
+        findings = [{"severity": "critical"} for _ in range(10)]
+        score = calculate_risk_score(findings)
+        assert score == 100.0
+
+    def test_engagement_success_score(self) -> None:
+        from src.agent.state import calculate_engagement_success, initial_state
+
+        state = initial_state(targets=["172.28.0.10"])
+        state["discovered_targets"] = [{"ip": "172.28.0.10"}]
+        state["findings"] = [{"severity": "critical"}]
+        state["current_phase"] = "exploitation"
+
+        result = calculate_engagement_success(state)
+        assert "overall" in result
+        assert result["discovery_rate"] == 100.0
+        assert result["overall"] > 0
+
+    def test_error_record_dataclass(self) -> None:
+        from src.agent.state import ErrorRecord
+
+        err = ErrorRecord(
+            phase="exploitation",
+            tool_name="msf_run_exploit",
+            error_message="Connection refused",
+            retry_count=2,
+        )
+        d = err.to_dict()
+        assert d["phase"] == "exploitation"
+        assert d["retry_count"] == 2
+        assert d["recovered"] is False
+
+    def test_kill_switch_thresholds_exist(self) -> None:
+        from src.agent.state import (
+            KILL_SWITCH_ERROR_THRESHOLD,
+            KILL_SWITCH_RISK_THRESHOLD,
+            MAX_CONSECUTIVE_FAILURES,
+        )
+
+        assert KILL_SWITCH_RISK_THRESHOLD == 80
+        assert KILL_SWITCH_ERROR_THRESHOLD == 10
+        assert MAX_CONSECUTIVE_FAILURES == 3
 
 
 class TestConfig:
@@ -181,14 +270,39 @@ class TestPrompts:
             "current_phase": "scanning",
             "step_count": 5,
             "targets": [{"ip": "172.28.0.10"}],
-            "findings": [{"id": 1}, {"id": 2}],
+            "findings": [{"severity": "high"}, {"severity": "medium"}],
             "sessions": [],
+            "risk_score": 23.0,
+            "discovered_targets": [{"ip": "172.28.0.10"}],
+            "active_sessions": {},
+            "strategy_history": [],
+            "aggression_level": "medium",
+            "stealth_mode": False,
         }
 
-        # state.get("allowed_subnet", settings.safety.allowed_target_subnet)
         prompt = build_system_prompt(state)
         assert "scanning" in prompt.lower()
         # The default settings use 172.28.0.0/16
         assert "172.28.0.0/16" in prompt
         assert "2 finding(s)" in prompt
         assert "Step**: 5" in prompt
+        assert "Risk Score**: 23.0" in prompt
+        assert "Think like an experienced red teamer" in prompt
+
+    def test_stealth_mode_in_prompt(self) -> None:
+        from src.agent.prompts import build_system_prompt
+
+        state = {
+            "current_phase": "reconnaissance",
+            "step_count": 0,
+            "findings": [],
+            "risk_score": 0,
+            "discovered_targets": [],
+            "active_sessions": {},
+            "strategy_history": [],
+            "aggression_level": "medium",
+            "stealth_mode": True,
+        }
+        prompt = build_system_prompt(state)
+        assert "STEALTH MODE" in prompt
+        assert "Stealth Mode**: ON" in prompt

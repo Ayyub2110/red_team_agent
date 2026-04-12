@@ -12,13 +12,21 @@ from src.logging import get_audit_logger
 
 
 def _get_msf_client() -> Any:
-    """Lazy-connect to the Metasploit RPC daemon."""
+    """Lazy-connect to the Metasploit RPC daemon with retries."""
     from pymetasploit3.msfrpc import MsfRpcClient
+    import time
 
     from src.config import get_settings
 
     cfg = get_settings().metasploit
-    return MsfRpcClient(cfg.password, server=cfg.host, port=cfg.port, username=cfg.user, ssl=False)
+    last_err = None
+    for attempt in range(1, 4):
+        try:
+            return MsfRpcClient(cfg.password, server=cfg.host, port=cfg.port, username=cfg.user, ssl=False)
+        except Exception as exc:
+            last_err = exc
+            time.sleep(2 ** attempt)
+    raise ConnectionError(f"Failed to connect to MSF RPC after 3 attempts: {last_err}")
 
 
 @tool
@@ -34,8 +42,13 @@ def msf_search_exploits(query: str) -> str:
     audit = get_audit_logger()
     audit.record("msf_search_start", tool="metasploit", parameters={"query": query})
 
-    client = _get_msf_client()
-    modules = client.modules.search(query)
+    try:
+        client = _get_msf_client()
+        modules = client.modules.search(query)
+    except Exception as exc:
+        error_msg = f"Metasploit RPC unavailable or search failed: {exc}. Suggestion: Fall back to nmap scripting engine (NSE) or manual enumeration."
+        audit.record("msf_search_error", tool="metasploit", result=error_msg)
+        return json.dumps({"error": error_msg})
 
     results = [
         {
@@ -137,7 +150,7 @@ def msf_run_exploit(
         return json.dumps(output, indent=2)
 
     except Exception as exc:
-        error_msg = f"Exploit failed: {exc}"
+        error_msg = f"Exploit failed or MSF unreachable: {exc}. Suggestion: Check Metasploit connectivity or use an alternative manual exploitation method."
         audit.record(
             "msf_exploit_error",
             tool="metasploit",

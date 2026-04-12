@@ -29,25 +29,31 @@ An industry-ready LangGraph-based red teaming agent that autonomously performs *
 ```mermaid
 graph TB
     subgraph "Agent Core (LangGraph)"
-        A[🧠 ReAct Agent] --> B{Tool Router}
-        B --> C[🔍 Nmap Scanner]
-        B --> D[🌐 HTTP Tools]
-        B --> E[📡 Scapy Network]
-        B --> F[💣 Metasploit RPC]
+        START[Start] --> MM[🧠 Memory Manager]
+        MM --> SP[🧩 Strategic Planner]
         
-        A --> G{Phase Transition}
-        G --> H[Reconnaissance]
-        G --> I[Scanning]
-        G --> J[Exploitation]
-        G --> K[Post-Exploitation]
-        G --> L[Reporting]
+        SP --> Critic[🔍 Critic Node]
+        Critic --> Recov{Recovery Needed?}
+        Recov -->|Yes| RNode[🔧 Recovery Node]
+        RNode --> SP
+        
+        Recov -->|No| AS[🎯 Adaptive Strategy]
+        AS --> Router{Phase Routing}
+        
+        Router --> Specialists[🔬 Specialists: Web/Network]
+        Router --> Phases[Offensive Phases]
+        
+        Specialists --> SP
+        Phases --> SP
+        
+        SP -->|Done| Learn[🧑‍🏫 Adaptive Learning]
     end
 
     subgraph "Safety Layer"
-        M[🛡️ Target Validation] --> A
-        N[👤 Human-in-the-Loop] --> B
-        O[📝 Audit Logger] --> A
-        P[⏱️ Step Limiter] --> A
+        M[🛡️ Target Validation] --> SP
+        N[👤 Human-in-the-Loop] --> Phases
+        O[📝 Audit Logger] --> Specialists
+        P[⏱️ Step Limiter] --> SP
     end
 
     subgraph "Docker Cyber Range (172.28.0.0/24)"
@@ -64,10 +70,10 @@ graph TB
         X[🌐 Web UI - Streamlit]
     end
 
-    W --> A
-    X --> A
+    W --> START
+    X --> START
     Q --> R & S & T & U
-    F --> V
+    Phases --> Q
 ```
 
 ### Agent Graph Flow
@@ -254,6 +260,9 @@ The Docker Compose environment creates an **isolated, air-gapped network** (`172
 ### CLI Commands
 
 ```bash
+# Pre-recorded Demo Engagement (Safe — No Network Calls)
+poetry run redteam demo
+
 # Full engagement
 poetry run redteam run
 
@@ -261,10 +270,8 @@ poetry run redteam run
 poetry run redteam run \
   --target 172.28.0.0/24 \
   --objective "Focus on web application vulnerabilities" \
-  --model qwen2.5-coder:7b
-
-# View audit log
-poetry run redteam report --log-file logs/audit.jsonl
+  --mode dynamic \
+  --verbose
 ```
 
 ### Web UI

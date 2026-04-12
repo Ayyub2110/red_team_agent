@@ -46,11 +46,17 @@ def nmap_scan(target: str, scan_type: str = "basic", ports: str | None = None) -
         parameters={"scan_type": scan_type, "ports": ports, "arguments": arguments},
     )
 
-    try:
-        scanner.scan(hosts=target, arguments=arguments)
-    except nmap.PortScannerError as exc:
-        audit.record("nmap_scan_error", tool="nmap", target=target, result=str(exc))
-        return json.dumps({"error": str(exc)})
+    import time
+    for attempt in range(1, 4):
+        try:
+            scanner.scan(hosts=target, arguments=arguments)
+            break
+        except nmap.PortScannerError as exc:
+            if attempt == 3:
+                error_msg = f"Nmap scan failed after 3 attempts: {exc}. Suggestion: Fall back to tcp_syn_scan, use -Pn, or try manual port enumeration."
+                audit.record("nmap_scan_error", tool="nmap", target=target, result=error_msg)
+                return json.dumps({"error": error_msg})
+            time.sleep(2 ** attempt)
 
     results: dict[str, Any] = {}
     for host in scanner.all_hosts():
