@@ -145,7 +145,7 @@ def _make_phase_agent(
     return create_react_agent(
         model=model,
         tools=tools,
-        state_modifier=state_modifier,
+        prompt=state_modifier,
     )
 
 
@@ -784,6 +784,8 @@ def run_redteam_agent(
             break
             
         for node_name, node_output in chunk.items():
+            if not isinstance(node_output, dict):
+                continue
             if node_name == "strategic_planner":
                 history = node_output.get("strategy_history", [])
                 if history:
