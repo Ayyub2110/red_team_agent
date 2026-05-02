@@ -10,15 +10,17 @@ from pydantic_settings import BaseSettings
 
 class LLMSettings(BaseSettings):
     """LLM provider configuration."""
+    model_config = {"env_file": ".env", "extra": "ignore"}
 
     ollama_base_url: str = Field(default="http://localhost:11434", alias="OLLAMA_BASE_URL")
-    ollama_model: str = Field(default="qwen2.5-coder:14b", alias="OLLAMA_MODEL")
+    ollama_model: str = Field(default="qwen2.5-coder:7b", alias="OLLAMA_MODEL")
     temperature: float = 0.1
     max_tokens: int = 4096
 
 
 class MetasploitSettings(BaseSettings):
     """Metasploit RPC connection settings."""
+    model_config = {"env_file": ".env", "extra": "ignore"}
 
     host: str = Field(default="127.0.0.1", alias="MSF_RPC_HOST")
     port: int = Field(default=55553, alias="MSF_RPC_PORT")
@@ -28,6 +30,7 @@ class MetasploitSettings(BaseSettings):
 
 class SafetySettings(BaseSettings):
     """Safety guardrail configuration."""
+    model_config = {"env_file": ".env", "extra": "ignore"}
 
     require_human_approval: bool = Field(default=True, alias="REQUIRE_HUMAN_APPROVAL")
     disable_target_validation: bool = Field(default=True, alias="DISABLE_TARGET_VALIDATION")
@@ -43,6 +46,7 @@ class SafetySettings(BaseSettings):
 
 class LoggingSettings(BaseSettings):
     """Logging and audit trail configuration."""
+    model_config = {"env_file": ".env", "extra": "ignore"}
 
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
     audit_log_file: Path = Field(default=Path("logs/audit.jsonl"), alias="AUDIT_LOG_FILE")
