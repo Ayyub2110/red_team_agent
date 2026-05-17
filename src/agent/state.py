@@ -205,11 +205,24 @@ def initial_state(
     stealth_mode: bool = False,
 ) -> AgentState:
     """Initialize a fresh agent state with all required fields."""
+    # Pre-populate discovered_targets with user targets so the planner doesn't get stuck if ping sweep fails
+    initial_discovered = []
+    if targets:
+        for t in targets:
+            initial_discovered.append({
+                "ip": t,
+                "hostname": "",
+                "open_ports": [],
+                "services": [],
+                "os_guess": "",
+                "priority": "medium",
+            })
+
     return {
         "messages": [],
         "current_phase": "reconnaissance",
         "findings": [],
-        "discovered_targets": [],
+        "discovered_targets": initial_discovered,
         "step_count": 0,
         "max_steps": max_steps,
         "risk_score": 0.0,

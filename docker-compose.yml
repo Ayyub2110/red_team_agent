@@ -13,6 +13,8 @@ services:
     security_opt:
       - no-new-privileges:false
     cap_drop: []
+    volumes:
+      - ./:/opt/agent
     depends_on:
       - ollama
 
@@ -31,6 +33,8 @@ services:
   dvwa:
     image: vulnerables/web-dvwa:latest
     container_name: redteam-dvwa
+    ports:
+      - "8080:80"
     networks:
       - redteam_net
 
