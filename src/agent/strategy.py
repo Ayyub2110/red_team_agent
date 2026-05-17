@@ -246,13 +246,25 @@ def classify_all_targets(
 # ══════════════════════════════════════════════════════════════════════════════
 
 SPECIALIST_WEB_TOOLS = [
-    "http_get", "http_post", "directory_bruteforce",
-    "nmap_scan", "msf_search_exploits", "msf_run_exploit", "msf_list_sessions",
+    "http_get",
+    "http_post",
+    "directory_bruteforce",
+    "nmap_scan",
+    "msf_search_exploits",
+    "msf_run_exploit",
+    "msf_list_sessions",
+    "record_finding",
 ]
 
 SPECIALIST_NETWORK_TOOLS = [
-    "nmap_scan", "tcp_syn_scan", "nmap_os_detection", "banner_grab",
-    "msf_search_exploits", "msf_run_exploit", "msf_list_sessions",
+    "nmap_scan",
+    "tcp_syn_scan",
+    "nmap_os_detection",
+    "banner_grab",
+    "msf_search_exploits",
+    "msf_run_exploit",
+    "msf_list_sessions",
+    "record_finding",
 ]
 
 

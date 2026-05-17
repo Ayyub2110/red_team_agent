@@ -81,8 +81,9 @@ PHASE_INSTRUCTIONS: dict[str, str] = {
     "scanning": """\
 ### Scanning
 **Goal**: Deep-dive into each discovered host to enumerate services and versions.
-1. Run service-detection scans (`nmap -sV`) on each discovered host.
-2. Enumerate open ports, services, and versions.
+1. You MUST use the `nmap_scan` tool to run service-detection scans (`-sV`) on each discovered host. Do NOT use `ping_sweep`.
+2. When you discover open ports, services, or vulnerabilities, you MUST call the `record_finding` tool to save them!
+3. Enumerate open ports, services, and versions.
 3. Attempt OS detection on high-priority targets.
 4. For any web service, run directory brute-forcing to find admin panels, APIs, etc.
 5. Cross-reference service versions against known CVEs mentally.

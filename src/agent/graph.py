@@ -55,15 +55,15 @@ RECON_TOOLS = [t for t in ALL_TOOLS if t.name in {
 }]
 
 SCANNING_TOOLS = [t for t in ALL_TOOLS if t.name in {
-    "nmap_scan", "tcp_syn_scan", "http_get", "http_post", "directory_bruteforce",
+    "nmap_scan", "tcp_syn_scan", "http_get", "http_post", "directory_bruteforce", "record_finding"
 }]
 
 EXPLOIT_TOOLS = [t for t in ALL_TOOLS if t.name in {
-    "msf_search_exploits", "msf_run_exploit", "msf_list_sessions",
+    "msf_search_exploits", "msf_run_exploit", "msf_list_sessions", "record_finding"
 }]
 
 POST_EXPLOIT_TOOLS = [t for t in ALL_TOOLS if t.name in {
-    "http_get", "banner_grab", "msf_list_sessions",
+    "http_get", "banner_grab", "msf_list_sessions", "record_finding"
 }]
 
 # Specialist tool sets (resolved from ALL_TOOLS)
